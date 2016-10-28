@@ -5,11 +5,11 @@
 docker-machine ssh  # 進入docker machine
 sudo mkdir -p /hostdata
 sudo mount -t vboxsf nk2016 /hostdata  # 此時/hostdata直通Windows disk
-sudo mkdir /hostdata/src
-sudo mkdir /hostdata/mongo
+#sudo mkdir /hostdata/src
+#sudo mkdir /hostdata/dbdata
 
 docker create -v /hostdata/src:/src --name nk2016_src ubuntu
-docker create -v /hostdata/mongo:/data/db --name nk2016_dbdata ubuntu  # mongodb 預設資料放在/data/db, 這裡把/data/db改mount到host上, 以達到persist. 但目前win7有問題.
+docker create -v /hostdata/dbdata:/data/db --name nk2016_dbdata ubuntu  # mongodb 預設資料放在/data/db, 這裡把/data/db改mount到host上, 以達到persist. 但目前win7有問題.
 
 #3. 啟動mongo container[nk2016_mongo] (windows 7 mount /data/db 到host上有issue,暫時沒有link到data container  )
 docker run -d -ti --name nk2016_mongo mongo
