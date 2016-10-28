@@ -1,0 +1,118 @@
+api=login
+method=post
+request=json
+{
+	from_type:string // "fb", "email", "guest"
+	from_fb_info:
+	{
+		fb_id:string,
+		fb_token:string,
+		nickname:string, //
+	}
+	from_email_info:
+	{
+		address:string,  // 123@456.com
+		password:string,
+		nickname:string,  // only used for first time
+	}
+	from_guest_info: // if user_id == user_key == "", create new account
+	{
+		user_id:string,
+		user_key:string,
+	}
+}
+
+response=json {
+	status:int,  // 0 = OK
+	user_id:string,
+	user_key:string,
+	nickname:string,
+}
+=============================================
+api=auth
+method=post
+request=json
+{
+	user_id:string,
+	user_key:string,  //
+}
+
+response=json {
+	status:int,
+	access_token:string,
+	expiration:int, // 1 day
+}
+
+
+=============================================
+api=question  // get random questions (number of questions = count )
+method=get
+request="access_token=string&count=int"
+
+response=json {
+	status:int,
+	questions:[
+		{
+			qid:int,
+			title:string,  //utf-8
+			options:[string,string,string,string]
+		},
+		...
+	],
+}
+
+=============================================
+api=question
+method=post
+request=json
+{
+	access_token:string,
+	answers:[
+		{
+			qid:int,
+			answer:int // 0,1,2,3. index of options array
+		},
+	]
+}
+
+response=json 
+{
+	status:int,
+	score:int,
+	result:[
+		{
+			qid:int,
+			title:string,  //utf-8
+			options:[string,string,string,string]
+			your_answer:int,
+			correct:int // 1=true, 0 = false
+		},
+		...
+	],
+}
+
+=============================================
+api=rank
+method=get
+request="access_token=string&userId=string&count=int"
+
+response:json {
+	status:int,
+	rank:int,
+	nickname:string,
+	score:int,
+	
+	top_rank:[
+		{
+			user_id:string,
+			nickname:string,
+			score:int,  // 500
+		},
+		{
+			user_id:string,
+			nickname:string,
+			score:int,  // 400
+		},
+		...
+	],
+}
