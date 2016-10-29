@@ -10,16 +10,15 @@ import gevent
 from gevent import monkey;monkey.patch_all();
 
 
-class NK2016Server(falcon.API):
+class ApplicationManager(object):
     def __init__(self):
-        falcon.API.__init__(self)
         self.mongo_manager = MongoManager("mongo", 27017)
 
     def get_mongo_manager(self):
         return self.mongo_manager
 
-
-nk2016server = NK2016Server()
-nk2016server.add_route('/', default.DefaultWSGIHandler(nk2016server))
-nk2016server.add_route('/login', login.LoginAPIHandler(nk2016server))
+ap_manager = ApplicationManager()
+api_router = falcon.API()
+api_router.add_route('/', default.DefaultWSGIHandler(ap_manager))
+api_router.add_route('/login', login.LoginAPIHandler(ap_manager))
 

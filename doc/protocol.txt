@@ -15,11 +15,8 @@ request=json
 		password:string,
 		nickname:string,  // only used for first time
 	}
-	from_guest_info: // if user_id == user_key == "", create new account
-	{
-		user_id:string,
-		user_key:string,
-	}
+
+	// for guest, no need to bring data.
 }
 
 response=json {
