@@ -22,13 +22,15 @@ class NK2016Client(object):
         self.logger = Logger()
         self.user_id = None
         self.user_key = None
+        #!! todo: put url in shell environment
+        self.url='http://localhost:8888'
 
     def login_by_guest(self):
         # TODO  check if user info cache exists. If exists, get previous user id. Otherwise, create one
         user_id = ''
         user_key = ''
         payload = {'from_type':'guest', 'user_id':user_id, 'user_key': user_key}
-        r = requests.post('http://localhost:8888/login', data=json.dumps(payload))
+        r = requests.post('{}/login'.format(self.url), data=json.dumps(payload))
         print "response=", r.content, " status code=", r.status_code, "header=", r.headers
 
         if r.status_code == 200:
@@ -37,6 +39,11 @@ class NK2016Client(object):
             self.user_key = resp['user_key']
             self.nickname = resp['nickname']
             self.logger.debug("login ok! user_id={},key={},nickname={}".format(self.user_id,self.user_key, self.nickname))
+            print "response=", r.content, " status code=", r.status_code, "header=", r.headers
+
+    def get_question(self):
+        r = requests.get('{}/question'.format(self.url), params={'access_token':'123','count':10})
+
 
 
 cli = NK2016Client()

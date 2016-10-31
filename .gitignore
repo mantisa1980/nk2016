@@ -1,0 +1,4 @@
+*.pyc
+*.wt
+*.lock
+*.bson

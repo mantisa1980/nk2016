@@ -1,0 +1,32 @@
+version: '2'
+services:
+  web:
+    image: mantisa1980/nk2016_webserver
+    ports: 
+      - "8888:8888"
+    volumes_from:
+      - nk2016_hostdata
+    depends_on:
+      - mongo
+      - nk2016_hostdata
+    links:
+      - mongo
+    #entrypoint:
+    #  - bash
+    tty: true
+      
+  mongo:
+    image: mongo
+    volumes_from:
+      - nk2016_mongodata
+    tty: true
+
+  nk2016_hostdata: # can be mounted and used as data volume even stopped.
+    image: ubuntu
+    volumes: 
+      - ~/nk2016:/hostdata:rw
+   
+  nk2016_mongodata:
+    image: ubuntu
+    volumes:
+      - ~/nk2016/dbdata:/data/db:rw
