@@ -1,5 +1,5 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
+#!/usr/bin/env python         
+# -*- coding: 
 __author__ = "duyhsieh"
 
 import falcon
@@ -34,4 +34,5 @@ ap_manager = ApplicationManager()
 api_router = falcon.API()
 api_router.add_route('/', default.DefaultWSGIHandler(ap_manager))
 api_router.add_route('/login', login.LoginAPIHandler(ap_manager))
+api_router.add_route('/question', question.QuestionAPIHandler(ap_manager))
 

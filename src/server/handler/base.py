@@ -21,5 +21,5 @@ class BaseWSGIHandler(object):
 
     def on_get(self, req, resp):
         resp.set_header('content-type', 'application/json')
-        json_data = json.loads(req.stream.read())
+        json_data = req.params
         return self.check_get_parameter(json_data), json_data

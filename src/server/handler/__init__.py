@@ -1,1 +1,1 @@
-__all__ = ["default","login"]
+__all__ = ['default','auth','login','question','rank']

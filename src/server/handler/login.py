@@ -23,7 +23,6 @@ class LoginAPIHandler(BaseWSGIHandler):
         self.col_account = self.db_user["Account"]
         self.col_account.create_index([('account',pymongo.ASCENDING),('key',pymongo.ASCENDING)],unique=True)
 
-
     def check_post_parameter(self,data):
         if 'from_type' not in data:
             return False

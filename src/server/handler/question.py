@@ -19,17 +19,26 @@ class QuestionAPIHandler(BaseWSGIHandler):
         self.db_question = self.mongo_manager.get_database("Question")
         self.col_question = self.db_question["General"]
         self.logger = ap_manager.get_logger()
+        self.answers = {
+            0:0,
+            1:1,
+            2:2,
+            3:3
+        }
 
         ##!! TODO create index
 
     def check_get_parameter(self,data):
-        #!!
-        return True
+        if 'access_token' in data and 'count' in data:
+            return True
+        return False
 
     def check_post_parameter(self,data):
-        #!!
-        return True
-
+        if 'access_token' in data and 'answers' in data:
+            return True
+        print "check fail,", data
+        return False
+        
     def on_get(self, req, resp):
         check_param, data = super(QuestionAPIHandler, self).on_get(req, resp)
         if not check_param:
@@ -37,7 +46,12 @@ class QuestionAPIHandler(BaseWSGIHandler):
             resp.status = falcon.HTTP_400
             return
 
-        response = {'status':SC.STATUS_OK, 'questions':[{'qid':0,'title':'Author\'s name ?', 'options':['Lin','Hsieh','Jump','Da']}] }
+        questions = [
+            {'qid':0,'title':u'Author\'s name ?', 'options':[u'Lin',u'Hsieh',u'Jump',u'Da']},
+            {'qid':2,'title':u'my name ?', 'options':[u'1',u'2',u'3',u'4']}
+        ]
+
+        response = {'status':SC.STATUS_OK, 'questions':questions }
         resp.body = json.dumps(response)
         resp.status = falcon.HTTP_200
 
@@ -48,6 +62,28 @@ class QuestionAPIHandler(BaseWSGIHandler):
             resp.status = falcon.HTTP_400
             return
 
-        response = {'status':SC.STATUS_OK, 'questions':[{'qid':0,'title':'Author\'s name ?', 'options':['Lin','Hsieh','Jump','Da']}] }
+        user_answers = data['answers']
+        result = []
+        #!! todo: check index valid. replace title/options 
+        score = 0
+        for x in user_answers:
+            qid = x['qid']
+            ans = x['answer']
+            doc = {
+                'qid':x['qid'],
+                'title':'question ' + str(qid),
+                'options':['option1','option2','option3','option4'],
+                'your_answer':x['answer'],
+                'correct': 1 if self.answers[qid] == ans else 0
+            }
+            if self.answers[qid] == ans:
+                score+=1
+            result.append(doc)
+
+        response = {'status':SC.STATUS_OK,
+                    'score':score,
+                    'result':result 
+        }
+
         resp.body = json.dumps(response)
         resp.status = falcon.HTTP_200
