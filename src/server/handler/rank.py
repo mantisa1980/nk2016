@@ -10,3 +10,9 @@ import falcon
 import random
 import time
 import traceback
+
+
+
+class RankAPIHandler(BaseWSGIHandler):
+    def __init__(self,ap_manager):
+    	pass

@@ -42,8 +42,21 @@ class NK2016Client(object):
             #self.logger.debug("login ok! user_id={},key={},nickname={}".format(self.user_id,self.user_key, self.nickname))
             print "[login]: content=", r.content, " status code=", r.status_code, "header=", r.headers
 
+    def auth(self):
+        user_id = ''
+        user_key = ''
+        payload = {'user_id':self.user_id, 'user_key':self.user_key}
+        r = requests.post('{}/auth'.format(self.url), data=json.dumps(payload))
+        print "[auth response]:content=", r.content, " status code=", r.status_code, "header=", r.headers
+
+        if r.status_code == 200:
+            resp = json.loads(r.content)
+            self.access_token = resp['access_token']
+            self.expire = resp['expiration']
+
     def get_question(self):
         r = requests.get('{}/question?access_token={}&count={}'.format(self.url ,self.access_token , 10))
+        #r = requests.get('{}/question?&count={}'.format(self.url ,self.access_token , 10))
         print "[get question]: content=", r.content, " status code=", r.status_code, "header=", r.headers
 
     def commit_question(self):
@@ -66,6 +79,7 @@ class NK2016Client(object):
 
 cli = NK2016Client()
 cli.login_by_guest()
+cli.auth()
 cli.get_question()
 cli.commit_question()
 

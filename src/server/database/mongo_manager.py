@@ -5,8 +5,8 @@ import pymongo
 
 
 class MongoManager(object):
-    def __init__(self, host, port):
-    	self.mongo = pymongo.MongoClient(host=host, port=port)
+    def __init__(self):
+    	self.mongo = pymongo.MongoClient(host='mongo', port=27017)
 
     def get_database(self,dbname):
     	return self.mongo[dbname]
