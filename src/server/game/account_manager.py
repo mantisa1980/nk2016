@@ -17,13 +17,14 @@ class AccountManager(object):
         self.col_serial = self.db_user["SerialNumber"]
         self.col_account = self.db_user["Account"]
         self.col_account.create_index([('account',pymongo.ASCENDING),('key',pymongo.ASCENDING)],unique=True)
+        self.col_account.create_index([('score',pymongo.DESCENDING),('account',pymongo.ASCENDING)])
 
         self.TOKEN_EXPIRE_TIME = 3600
         self.redis_cli = redis_manager.get_redis_client('access_token')
 
     def generate_access_token(self,user_id):
         try:
-            access_token = str(md5.new(str(random.randint(0,1000000))).hexdigest())
+            access_token = '{}_{}'.format(user_id, str(md5.new(str(random.randint(0,1000000))).hexdigest()))
             self.redis_cli.setex(access_token, self.TOKEN_EXPIRE_TIME, user_id)
             return access_token,self.TOKEN_EXPIRE_TIME
         except:
@@ -31,14 +32,18 @@ class AccountManager(object):
             return None,None
 
     def validate_access_token(self,access_token):
-        return self.redis_cli.expire(access_token,self.TOKEN_EXPIRE_TIME)
+        r = self.redis_cli.expire(access_token,self.TOKEN_EXPIRE_TIME)
+        if r:
+            user_id = access_token.split("_")[1]
+            return True,user_id
+        return False,None
 
     def create_account(self):
         try:
             doc = self.col_serial.find_and_modify({'name':'counter'}, {'$inc':{'value':1}},upsert=True,new=True)
             acc = doc['value']
             key = str(md5.new(str(random.randint(0,1000000000))).hexdigest())
-            self.col_account.insert({'account':acc,'key':key})
+            self.col_account.insert({'account':acc,'key':key, 'score':0 })
             return acc, key
         except:
             log.error(traceback.format_exc())
@@ -53,3 +58,19 @@ class AccountManager(object):
         except:
             log.error(traceback.format_exc())
             return None
+
+    def add_score(self,user_id,score):
+        try:
+            self.col_account.find_and_modify({'account':user_id}, {'$inc':{'score':score}})
+        except:
+            log.error(traceback.format_exc())
+
+    def get_score_rank(self,user_id):
+        try:
+            doc = self.col_account.find_one({'account':user_id})
+            score = doc['score']
+            rank = self.col_account.count({'score':{'$gt':score}})
+            return score, rank+1
+
+        except:
+            log.error(traceback.format_exc())

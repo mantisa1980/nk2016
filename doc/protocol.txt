@@ -48,11 +48,12 @@ request="access_token=string&count=int"
 
 response=json {
 	status:int,
+	serial_number:string,
 	questions:[
 		{
 			qid:int,
 			title:string,  //utf-8
-			options:[string,string,string,string]
+			options:[string,string,string]
 		},
 		...
 	],
@@ -63,6 +64,7 @@ api=question
 method=post
 request=json
 {
+	serial_number:string
 	access_token:string,
 	answers:[
 		{
@@ -80,7 +82,7 @@ response=json
 		{
 			qid:int,
 			title:string,  //utf-8
-			options:[string,string,string,string]
+			options:[string,string,string]
 			your_answer:int,
 			correct:int // 1=true, 0 = false
 		},

@@ -58,12 +58,16 @@ class NK2016Client(object):
         r = requests.get('{}/question?access_token={}&count={}'.format(self.url ,self.access_token , 10))
         #r = requests.get('{}/question?&count={}'.format(self.url ,self.access_token , 10))
         print "[get question]: content=", r.content, " status code=", r.status_code, "header=", r.headers
+        if r.status_code == 200:
+            resp = json.loads(r.content)
+            self.serial_number = resp['serial_number']
 
     def commit_question(self):
         user_id = ''
         user_key = ''
         payload = {
             'access_token':self.access_token,
+            'serial_number':self.serial_number,
             'answers':[
                 { 'qid':0, 'answer':0 },
                 { 'qid':2, 'answer':2 },
@@ -73,6 +77,9 @@ class NK2016Client(object):
         print "[commit question]:content=", r.content, " status code=", r.status_code, "header=", r.headers
 
         if r.status_code == 200:
+            print "-------- testing duplicate questionniare"
+            r = requests.post('{}/question'.format(self.url), data=json.dumps(payload))
+            print "[re-commit question]:content=", r.content, " status code=", r.status_code, "header=", r.headers            
             pass
 
 

@@ -10,6 +10,7 @@ from handler import *
 from database.mongo_manager import MongoManager
 from database.redis_manager import RedisManager
 from game.account_manager import AccountManager
+from game.question_manager import QuestionManager
 from lib import log
 
 
@@ -18,6 +19,7 @@ class ApplicationManager(object):
         self.mongo_manager = MongoManager()
         self.redis_manager = RedisManager()
         self.account_manager = AccountManager(self.mongo_manager,self.redis_manager)
+        self.question_manager = QuestionManager(self.mongo_manager,self.redis_manager,self.account_manager)
 
     def get_mongo_manager(self):
         return self.mongo_manager
@@ -27,6 +29,9 @@ class ApplicationManager(object):
 
     def get_account_manager(self):
         return self.account_manager
+
+    def get_question_manager(self):
+        return self.question_manager
 
 ap_manager = ApplicationManager()
 api_router = falcon.API()

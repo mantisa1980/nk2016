@@ -44,10 +44,17 @@ class BaseWSGIHandler(object):
             resp.status = falcon.HTTP_500
             resp.body = json.dumps({'status':SC.STATUS_ERROR})
 
+
 class CommandWSGIHandler(BaseWSGIHandler):
-    def check_access_token(self,token):
-        # todo: check token valid
-        return True
+    def __init__(self,ap_manager):
+        self.ap_manager = ap_manager
+        self.account_manager = ap_manager.get_account_manager()
+
+    def get_user_by_token(self,token):
+        boolean , user = self.account_manager.validate_access_token(token)
+        if boolean:
+            return user
+        return None
 
     def on_get(self, req, resp):
         resp.set_header('content-type', 'application/json')
@@ -57,12 +64,20 @@ class CommandWSGIHandler(BaseWSGIHandler):
             resp.body = json.dumps({'status':SC.STATUS_INVALID_PARAMETER })
             resp.status = falcon.HTTP_400
             return
-        if not self.check_access_token(json_data['access_token']):
+
+        user = self.get_user_by_token(json_data['access_token'])
+        if user is None:
+            resp.body = json.dumps({'status':SC.STATUS_TOKEN_EXPIRED })
             resp.status = falcon.HTTP_401
             return
-
-        resp.body = json.dumps(self.handle_get(req,resp,json_data))
-        resp.status = falcon.HTTP_200        
+    
+        ret = self.handle_get(req,resp,{'user_id':user},json_data)
+        if type(ret) == dict:
+            ret['status'] = SC.STATUS_OK
+            resp.body = json.dumps(ret)
+        else:
+            resp.status = falcon.HTTP_500
+            resp.body = json.dumps({'status':SC.STATUS_ERROR})
 
     def on_post(self, req, resp):
         resp.set_header('content-type', 'application/json')
@@ -72,12 +87,14 @@ class CommandWSGIHandler(BaseWSGIHandler):
             resp.status = falcon.HTTP_400
             resp.body = json.dumps({'status':SC.STATUS_INVALID_PARAMETER })
             return
-        if not self.check_access_token(json_data['access_token']):
-            resp.status = falcon.HTTP_401
+
+        user = self.get_user_by_token(json_data['access_token'])
+        if user is None:
             resp.body = json.dumps({'status':SC.STATUS_TOKEN_EXPIRED })
+            resp.status = falcon.HTTP_401
             return
 
-        ret = self.handle_post(req,resp,json_data)
+        ret = self.handle_post(req,resp,{'user_id':user},json_data)
         if type(ret) == dict:
             ret['status'] = SC.STATUS_OK
             resp.body = json.dumps(ret)

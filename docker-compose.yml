@@ -17,11 +17,13 @@ services:
   mongo:
     image: mongo
     volumes_from:
+      - nk2016_hostdata
       - nk2016_mongodata
   
   redis: # todo: persistence
     image: redis
     volumes_from:
+      - nk2016_hostdata
       - nk2016_redisdata
 
   nk2016_hostdata: # can be mounted and used as data volume even stopped.

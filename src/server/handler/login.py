@@ -14,6 +14,10 @@ import traceback
 import pymongo
 from lib import log
 
+'''
+Motivation: to get a unique game account.
+If account(user_id and user_key) already saved in client side, just continue to auth.
+'''
 
 class LoginAPIHandler(BaseWSGIHandler):
     def __init__(self,ap_manager):
