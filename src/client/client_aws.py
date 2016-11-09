@@ -27,7 +27,7 @@ class NK2016Client(object):
         self.user_id = None
         self.user_key = None
         #!! todo: put url in shell environment
-        self.url='http://localhost:8888'
+        self.url='http://54.174.128.174:8888'
         self.answers = []
 
     def login_by_guest(self):

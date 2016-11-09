@@ -20,38 +20,26 @@ class DefaultWSGIHandler(object):
                                 'params' # for http parameters
                                 ]
 
-    def show_attributes(self,req):
-        for att in self.show_attributes:
-            print "{}={}".format(att,getattr(req,att))
+    #def show_attributes(self,req):
+    #    for att in self.show_attributes:
+    #        print "{}={}".format(att,getattr(req,att))
 
     def on_post(self, req, resp):
-        response = {
-            'handler': self.__class__.__name__
-        }
-        self.show_attributes(req)
-        print "stream={}".format(req.stream.read())
-        resp.body = json.dumps(response)
+        #self.show_attributes(req)
+        #print "stream={}".format(req.stream.read())
+        resp.body = json.dumps({"post":" Hello World"})
 
     def on_get(self, req, resp):
-        response = {
-            'handler': self.__class__.__name__
-        }
         #req.get_param(key)
-        self.show_attributes(req)
-        resp.body = json.dumps(response)    
+        #self.show_attributes(req)
+        resp.body = json.dumps({"get":"Hello World"})
 
     def on_put(self, req, resp):
-        response = {
-            'handler': self.__class__.__name__
-        }
-        self.show_attributes(req)
-        print "stream={}".format(req.stream.read())
-        resp.body = json.dumps(response)
+        #self.show_attributes(req)
+        #print "stream={}".format(req.stream.read())
+        resp.body = json.dumps({"put":"Hello World"})
 
     def on_delete(self, req, resp):
-        response = {
-            'handler': self.__class__.__name__
-        }
-        self.show_attributes(req)
-        print "stream={}".format(req.stream.read())
-        resp.body = json.dumps(response)
+        #self.show_attributes(req)
+        #print "stream={}".format(req.stream.read())
+        resp.body = json.dumps({"delete":"Hello World"})

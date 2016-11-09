@@ -34,16 +34,17 @@ class AccountManager(object):
     def validate_access_token(self,access_token):
         r = self.redis_cli.expire(access_token,self.TOKEN_EXPIRE_TIME)
         if r:
-            user_id = access_token.split("_")[1]
+            user_id = access_token.split("_")[0]
             return True,user_id
         return False,None
 
-    def create_account(self):
+    def create_account(self,nickname=None):
         try:
             doc = self.col_serial.find_and_modify({'name':'counter'}, {'$inc':{'value':1}},upsert=True,new=True)
-            acc = doc['value']
+            acc = '%08d' % doc['value']
+            name = nickname if nickname is not None else acc
             key = str(md5.new(str(random.randint(0,1000000000))).hexdigest())
-            self.col_account.insert({'account':acc,'key':key, 'score':0 })
+            self.col_account.insert({'account':acc,'key':key, 'score':0, 'nickname':name })
             return acc, key
         except:
             log.error(traceback.format_exc())
@@ -65,12 +66,30 @@ class AccountManager(object):
         except:
             log.error(traceback.format_exc())
 
-    def get_score_rank(self,user_id):
+    def get_user_rank(self,user_id):
         try:
             doc = self.col_account.find_one({'account':user_id})
             score = doc['score']
-            rank = self.col_account.count({'score':{'$gt':score}})
-            return score, rank+1
-
+            rank = self.col_account.find({'score':{'$gt':score}}).count()
+            return doc, rank+1
         except:
             log.error(traceback.format_exc())
+
+    def get_top_rank(self,count):
+        ret = []
+        try:
+            cursor = self.col_account.find({},{"_id":False, "key":False}).sort([("score",pymongo.DESCENDING)]).limit(count)
+            for i in cursor:
+                doc = {
+                    'user_id':i['account'],
+                    'score':i['score'],
+                    'nickname':i['nickname']
+                }
+                ret.append(doc)
+        except:
+            log.error(traceback.format_exc())
+        
+        return ret
+
+
+
