@@ -35,14 +35,13 @@ class LoginAPIHandler(BaseWSGIHandler):
         return {'user_id':account, 'user_key':key, 'nickname':name}
 
     def on_facebook_login(self,resp,data):
-    	fb_id = data['Fb_id']
-    	name = data['name']
+    	fb_id = data['from_fb_info']['fb_id']
+    	name = data['from_fb_info']['nickname']
     	bind_user_id = self.account_mgr.get_user_id_by_facebook(fb_id)
     	if bind_user_id is None:
         	account,key,nickname = self.account_mgr.create_account(name)
         	self.account_mgr.bind_user_id_by_facebook_id(account,fb_id)
         else:
-        	print "found bind id"
         	account = bind_user_id
         	user_account_data = self.account_mgr.get_account(bind_user_id)
         	nickname = user_account_data['nickname']

@@ -48,9 +48,15 @@ class NK2016Client(object):
 
     def login_by_facebook(self): #  just to emulate... not really facebook oauth
         # TODO  check if user info cache exists. If exists, get previous user id. Otherwise, create one
-        fb_id = 1234567899
+        fb_id = 12345678990
         user_key = ''
-        payload = {'from_type':'fb', 'Fb_id':fb_id, 'name':'duy'}
+        payload = {'from_type':'fb', 
+                    'from_fb_info':
+                    {
+                        'fb_id':fb_id, 
+                        'nickname':'duy'
+                    }
+        }
         r = requests.post('{}/login'.format(self.url), data=json.dumps(payload))
         print "[login response]:content=", r.content, " status code=", r.status_code, "header=", r.headers
 

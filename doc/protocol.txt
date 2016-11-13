@@ -2,21 +2,12 @@ api=login
 method=post
 request=json
 {
-	from_type:string // "fb", "email", "guest"
+	from_type:string // "fb"
 	from_fb_info:
 	{
 		fb_id:string,
-		fb_token:string,
 		nickname:string, //
 	}
-	from_email_info:
-	{
-		address:string,  // 123@456.com
-		password:string,
-		nickname:string,  // only used for first time
-	}
-
-	// for guest, no need to bring data.
 }
 
 response=json {
