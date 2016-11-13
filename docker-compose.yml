@@ -1,7 +1,7 @@
 version: '2'
 services:
   web:
-    image: mantisa1980/nk2016_web:001
+    image: mantisa1980/nk2016_web:002
     ports: 
       - "8888:8888"
     volumes_from:
