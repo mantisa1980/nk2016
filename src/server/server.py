@@ -5,6 +5,7 @@ __author__ = "duyhsieh"
 import gevent
 from gevent import monkey;monkey.patch_all();
 import falcon
+from falcon_cors import CORS
 import json
 from handler import *
 from database.mongo_manager import MongoManager
@@ -33,8 +34,14 @@ class ApplicationManager(object):
     def get_question_manager(self):
         return self.question_manager
 
+cors = CORS(allow_origins_list=['http://45.33.73.179:8888'])
+api = falcon.API(middleware=[cors.middleware])
+
 ap_manager = ApplicationManager()
-api_router = falcon.API()
+#api_router = falcon.API()
+cors = CORS(allow_origins_list=['http://45.33.73.179:8888'])
+api_router = falcon.API(middleware=[cors.middleware])
+
 api_router.add_route('/', default.DefaultWSGIHandler(ap_manager))
 api_router.add_route('/login', login.LoginAPIHandler(ap_manager))
 api_router.add_route('/auth', auth.AuthAPIHandler(ap_manager))

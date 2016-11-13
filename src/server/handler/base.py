@@ -22,6 +22,9 @@ class BaseWSGIHandler(object):
 
     def on_get(self, req, resp):
         resp.set_header('content-type', 'application/json')
+        resp.set_header('Access-Control-Allow-Origin', '*')
+        resp.set_header('Access-Control-Allow-Methods', 'GET')
+        resp.set_header('Access-Control-Max-Age', '1000')
         json_data = req.params
 
         ret = self.handle_get(req,resp,json_data)
@@ -34,6 +37,9 @@ class BaseWSGIHandler(object):
 
     def on_post(self, req, resp):
         resp.set_header('content-type', 'application/json')
+        resp.set_header('Access-Control-Allow-Origin', '*')
+        resp.set_header('Access-Control-Allow-Methods', 'POST')
+        resp.set_header('Access-Control-Max-Age', '1000')
         json_data = json.loads(req.stream.read())
         
         ret = self.handle_post(req,resp,json_data)
@@ -58,6 +64,9 @@ class CommandWSGIHandler(BaseWSGIHandler):
 
     def on_get(self, req, resp):
         resp.set_header('content-type', 'application/json')
+        resp.set_header('Access-Control-Allow-Origin', '*')
+        resp.set_header('Access-Control-Allow-Methods', 'GET')
+        resp.set_header('Access-Control-Max-Age', '1000')
         json_data = req.params
 
         if 'access_token' not in json_data:
@@ -81,6 +90,9 @@ class CommandWSGIHandler(BaseWSGIHandler):
 
     def on_post(self, req, resp):
         resp.set_header('content-type', 'application/json')
+        resp.set_header('Access-Control-Allow-Origin', '*')
+        resp.set_header('Access-Control-Allow-Methods', 'POST')
+        resp.set_header('Access-Control-Max-Age', '1000')
         json_data = json.loads(req.stream.read())
         
         if 'access_token' not in json_data:

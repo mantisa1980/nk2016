@@ -24,6 +24,9 @@ class LoginAPIHandler(BaseWSGIHandler):
         super(LoginAPIHandler, self).__init__(ap_manager)
         self.account_mgr = ap_manager.get_account_manager()
 
+    def handle_get(self,req,resp,data):
+        return {"OK":"OK"}
+
     def handle_post(self,req,resp,data):
         if data['from_type'] == 'guest':
             return self.on_guest_login(resp,data)
