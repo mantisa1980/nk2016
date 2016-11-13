@@ -27,7 +27,26 @@ class LoginAPIHandler(BaseWSGIHandler):
     def handle_post(self,req,resp,data):
         if data['from_type'] == 'guest':
             return self.on_guest_login(resp,data)
+        elif data['from_type'] == 'fb':
+        	return self.on_facebook_login(resp,data)
 
     def on_guest_login(self,resp,data):
-        account,key = self.account_mgr.create_account()
-        return {'user_id':account, 'user_key':key, 'nickname':account}
+        account,key,name = self.account_mgr.create_account()
+        return {'user_id':account, 'user_key':key, 'nickname':name}
+
+    def on_facebook_login(self,resp,data):
+    	fb_id = data['Fb_id']
+    	name = data['name']
+    	bind_user_id = self.account_mgr.get_user_id_by_facebook(fb_id)
+    	if bind_user_id is None:
+        	account,key,nickname = self.account_mgr.create_account(name)
+        	self.account_mgr.bind_user_id_by_facebook_id(account,fb_id)
+        else:
+        	print "found bind id"
+        	account = bind_user_id
+        	user_account_data = self.account_mgr.get_account(bind_user_id)
+        	nickname = user_account_data['nickname']
+        	key = user_account_data['key']
+        
+        return {'user_id':account, 'user_key':key, 'nickname':nickname}
+

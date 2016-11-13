@@ -46,6 +46,22 @@ class NK2016Client(object):
             #self.logger.debug("login ok! user_id={},key={},nickname={}".format(self.user_id,self.user_key, self.nickname))
             print "[login]: content=", r.content, " status code=", r.status_code, "header=", r.headers
 
+    def login_by_facebook(self): #  just to emulate... not really facebook oauth
+        # TODO  check if user info cache exists. If exists, get previous user id. Otherwise, create one
+        fb_id = 1234567899
+        user_key = ''
+        payload = {'from_type':'fb', 'Fb_id':fb_id, 'name':'duy'}
+        r = requests.post('{}/login'.format(self.url), data=json.dumps(payload))
+        print "[login response]:content=", r.content, " status code=", r.status_code, "header=", r.headers
+
+        if r.status_code == 200:
+            resp = json.loads(r.content)
+            self.user_id = resp['user_id']
+            self.user_key = resp['user_key']
+            self.nickname = resp['nickname']
+            #self.logger.debug("login ok! user_id={},key={},nickname={}".format(self.user_id,self.user_key, self.nickname))
+            print "[login]: content=", r.content, " status code=", r.status_code, "header=", r.headers
+
     def auth(self):
         user_id = ''
         user_key = ''
@@ -133,7 +149,8 @@ class NK2016Client(object):
 
 
 cli = NK2016Client()
-cli.login_by_guest()
+#cli.login_by_guest()
+cli.login_by_facebook()
 cli.auth()
 cli.get_question()
 cli.commit_question()

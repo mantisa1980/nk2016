@@ -15,9 +15,12 @@ class AccountManager(object):
         self.mongo_manager = mongo_manager
         self.db_user = self.mongo_manager.get_database("User")
         self.col_serial = self.db_user["SerialNumber"]
+        self.col_fb = self.db_user["Facebook"]
+
         self.col_account = self.db_user["Account"]
         self.col_account.create_index([('account',pymongo.ASCENDING),('key',pymongo.ASCENDING)],unique=True)
         self.col_account.create_index([('score',pymongo.DESCENDING),('account',pymongo.ASCENDING)])
+        self.col_fb.create_index([('fb_id',pymongo.DESCENDING)], unique=True)
 
         self.TOKEN_EXPIRE_TIME = 3600
         self.redis_cli = redis_manager.get_redis_client('access_token')
@@ -38,6 +41,9 @@ class AccountManager(object):
             return True,user_id
         return False,None
 
+    def get_account(self,user_id): # !!only for facebook temporary implementation; this is not regular and not secure
+        return self.col_account.find_one({'account':user_id})
+
     def create_account(self,nickname=None):
         try:
             doc = self.col_serial.find_and_modify({'name':'counter'}, {'$inc':{'value':1}},upsert=True,new=True)
@@ -45,7 +51,7 @@ class AccountManager(object):
             name = nickname if nickname is not None else acc
             key = str(md5.new(str(random.randint(0,1000000000))).hexdigest())
             self.col_account.insert({'account':acc,'key':key, 'score':0, 'nickname':name })
-            return acc, key
+            return acc, key, name
         except:
             log.error(traceback.format_exc())
             return None,None
@@ -91,5 +97,16 @@ class AccountManager(object):
         
         return ret
 
+    # scenario: 1st login: only brings fb_id. 
+    # if recv fb_id: If no binding, create one account and bind them; If yes,() return user data
+
+    def get_user_id_by_facebook(self,fb_id):
+        doc = self.col_fb.find_one({'fb_id':fb_id})
+        if doc is not None:
+           return doc['user_id']
+        return None
+
+    def bind_user_id_by_facebook_id(self,user_id,fb_id):
+        self.col_fb.insert({'fb_id':fb_id, 'user_id':user_id})
 
 
